@@ -1,0 +1,2 @@
+# Django Library Management System
+- A simple and elegant Django web application for managing a book library. This project demonstrates fundamental Django concepts including models, views, templates, and the Django Admin interface.
