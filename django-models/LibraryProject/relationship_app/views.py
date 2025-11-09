@@ -1,42 +1,41 @@
-from django.shortcuts import render,redirect
-from .models import Book, Library
-from django.views.generic import ListView
-from .forms import UserRegistrationForm
-from django.contrib import messages
-from django.contrib.auth import logout
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import permission_required
+from django.shortcuts import render
+from .models import Book
+from .models import Library
+from django.views.generic.detail import DetailView
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponseForbidden
+from .models import UserProfile
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.views import LoginView, LogoutView
 
-# Create your views here.
-def book_list(request):
-    context = {
-        "books" : Book.objects.all()
-    }
-    return render(request, "relationship_app/list_books.html", context=context)
+def list_books(request):
+	books = Book.objects.all()
+	return render(request, "relationship_app/list_books.html", {'books': books})
 
-class LibraryList(ListView):
-    model = Library
-    template_name = "relationship_app/library_detail.html"
-    context_object_name = "library"
-
-def register_user(request):
+class LibraryDetailView(DetailView):
+	model = Library
+	template_name = 'relationship_app/library_detail.html'
+	context_object_name = 'library'
+def register(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}!')
-            return redirect('login')
+            user = form.save()
+            login(request, user)  
+            return redirect('login')  
     else:
-        form = UserRegistrationForm()
+        form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
-def logout_user(request):
-    logout(request)
+class CustomLoginView(LoginView):
+    template_name = 'relationship_app/login.html'
 
-    return render(request, "relationship_app/logout.html")
-
+class CustomLogoutView(LogoutView):
+    template_name = 'relationship_app/logout.html'
+	
 def is_admin(user):
     return user.userprofile.role == 'Admin'
 
