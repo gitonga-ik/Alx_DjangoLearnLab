@@ -3,9 +3,18 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect, get_object_or_404
+from bookshelf.forms import ExampleForm
 from bookshelf.models import Book
 
 # Create your views here.
+def search_books(request):
+    form = ExampleForm(request.GET)
+    books = []
+    if form.is_valid():
+        query = form.cleaned_data['query']
+        books = Book.objects.filter(title__icontains=query)  # Safe query using ORM
+    return render(request, 'bookshelf/search_results.html', {'form': form, 'books': books})
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -26,7 +35,7 @@ class CustomLogoutView(LogoutView):
 @permission_required('books.can_view', raise_exception=True)
 def book_list(request):
     books = Book.objects.all()
-    return render(request, 'bookshelf/list_books.html', {'books': books})
+    return render(request, 'bookshelf/book_list.html', {'books': books})
 
 @permission_required('bookshelf.can_create', raise_exception=True)
 def add_book(request):
