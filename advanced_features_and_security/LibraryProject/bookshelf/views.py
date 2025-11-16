@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect, get_object_or_404
-from bookshelf.forms import ExampleForm
+from .forms import ExampleForm
 from bookshelf.models import Book
 
 # Create your views here.
