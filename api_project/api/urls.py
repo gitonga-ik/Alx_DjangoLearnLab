@@ -1,14 +1,13 @@
-from django.contrib import admin
 from django.urls import path,include
 from .views import BookList, BookViewSet
-from rest_framework.routers import DefaultRouter
-from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework import router
+from rest_framework.authtoken import views
 
-router = DefaultRouter()
+router = router.DefaultRouter()
 router.register(r'books_all', BookViewSet, basename='book_all')
 
 urlpatterns = [
     path('books/', BookList.as_view(), name='book-list'),  
-    path('get-token', obtain_auth_token, name='auth-token'),
+    path('get-token', views.obtain_auth_token, name='auth-token'),
     path('', include(router.urls))
 ]
